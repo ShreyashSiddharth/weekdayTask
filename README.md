@@ -22,3 +22,5 @@ To Run on Local Machine
 -  npm i
 - npm start
 
+-Hosted Site Link
+https://adorable-figolla-6a3e9b.netlify.app/
