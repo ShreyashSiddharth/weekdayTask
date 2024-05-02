@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
 import "../Card/card.css";
 
-function Card({ data }) {
-
-//  Company Name is Missing in the API so sample Company is Used
+function Card({
+  apiJobDetails,
+  apijobRole,
+  apiLocation,
+  apiMinExp,
+  apiMinJdSalary,
+  apiMaxJdSalary,
+  apisalaryCurrencyCode,
+}) {
+  //  Company Name is Missing in the API so sample Company is Used
 
   const [aboutCompany, setAboutCompany] = useState("");
   const [jobRole, setJobRole] = useState("");
@@ -16,13 +23,13 @@ function Card({ data }) {
   const [isDescExpanded, setIsDescExpanded] = useState(false);
 
   useEffect(() => {
-    setJobRole(data?.jobRole);
-    setJobLocation(data?.location);
-    setMinExp(data?.minExp);
-    setMinJdSalary(data?.minJdSalary);
-    setMaxJdSalary(data?.maxJdSalary);
-    setAboutCompany(data?.jobDetailsFromCompany);
-    setCurrencyCode(data?.salaryCurrencyCode);
+    setJobRole(apijobRole);
+    setJobLocation(apiLocation);
+    setMinExp(apiMinExp);
+    setMinJdSalary(apiMinJdSalary);
+    setMaxJdSalary(apiMaxJdSalary);
+    setAboutCompany(apiJobDetails);
+    setCurrencyCode(apisalaryCurrencyCode);
   }, []);
   const getFirstFewWords = (text) => {
     const words = text.split(/\s+/);

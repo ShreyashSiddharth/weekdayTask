@@ -4,7 +4,7 @@ import Card from "./Components/Card/card";
 import Select from "react-select";
 
 function App() {
-  const [jobListAfterFilters, setJobListAfterFilters] = useState([]);
+ 
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -13,7 +13,7 @@ function App() {
   const [selectedExperience , setSelectedExperience]  = useState(0);
   const [selectedMinBaseSalary , setSelectedMinBaseSalary] = useState(0);
   const [allJobs, setAllJobs] = useState([]);
-
+  const [jobListAfterFilters, setJobListAfterFilters] = useState(allJobs);
   const fetchData = async () => {
     if (loading) return;
     setLoading(true);
@@ -38,8 +38,9 @@ function App() {
       if (!data || data?.jdList.length === 0) {
         setHasMore(false);
       } else {
-        setJobListAfterFilters((prevItems) => [...prevItems, ...data?.jdList]);
+       
         setAllJobs((prevItems) => [...prevItems, ...data?.jdList]);
+      
         setOffset((prevOffset) => prevOffset + 9);
       }
     } catch (error) {
@@ -112,41 +113,41 @@ function App() {
     { value: "90", label: "90K" },
     { value: "100", label: "100K" },
   ];
+
+  useEffect(() => {
+    console.log(jobListAfterFilters); 
+}, [jobListAfterFilters]);
   function applyFilters() {
-    let filteredJobs = allJobs;
-  
-    
+    let filteredJobs = [...allJobs];  
+
     if (selectedRoles.length) {
-      filteredJobs = filteredJobs.filter(job =>
-        selectedRoles.some(role => job.jobRole.includes(role.value))
-      );
+        filteredJobs = filteredJobs.filter(job =>
+            selectedRoles.some(role => role.value === job.jobRole)
+        );
     }
-  
-   
+
     if (selectedLocations.length) {
-      filteredJobs = filteredJobs.filter(job =>
-        selectedLocations.some(location => job.location === location.value)
-      );
+        filteredJobs = filteredJobs.filter(job =>
+            selectedLocations.some(location => location.value === job.location)
+        );
     }
-  
-    
+
     if (selectedExperience) {
-      filteredJobs = filteredJobs.filter(job =>
-        (job.minExp !== null ? job.minExp <= parseInt(selectedExperience.value) : true) &&
-        (job.maxExp !== null ? job.maxExp >= parseInt(selectedExperience.value) : true)
-      );
+        filteredJobs = filteredJobs.filter(job => {
+            const expValue = parseInt(selectedExperience.value, 10);
+            return (job.minExp !== null ? job.minExp <= expValue : true) &&
+                (job.maxExp !== null ? job.maxExp >= expValue : true);
+        });
     }
-  
-    
+
     if (selectedMinBaseSalary) {
-      filteredJobs = filteredJobs.filter(job => 
-        job.minJdSalary !== null && job.minJdSalary >= parseInt(selectedMinBaseSalary.value)
-      );
+        filteredJobs = filteredJobs.filter(job =>
+            job.minJdSalary !== null && job.minJdSalary >= parseInt(selectedMinBaseSalary.value, 10)
+        );
     }
-    setJobListAfterFilters(filteredJobs);
-    
-    
-  }
+
+    setJobListAfterFilters(filteredJobs);  
+}
   
 
   useEffect(() => {
@@ -170,7 +171,7 @@ function App() {
           className="basic-multi-select"
           classNamePrefix="select"
           options={roleOptions}
-          onChange={(option)=> setSelectedRoles(option)}
+          onChange={(option)=> setSelectedRoles(option || [])}
         />
         <Select
           isMulti
@@ -180,7 +181,7 @@ function App() {
           className="basic-multi-select"
           classNamePrefix="select"
           options={locationOptions}
-          onChange={(option)=> setSelectedLocations(option)}
+          onChange={(option)=> setSelectedLocations(option || [])}
         />
 
         <Select
@@ -190,7 +191,7 @@ function App() {
           className="basic-multi-select"
           classNamePrefix="select"
           options={experienceOptions}
-          onChange={(option)=> setSelectedExperience(option)}
+          onChange={(option)=> setSelectedExperience(option || null)}
         />
         <Select
           isClearable
@@ -199,7 +200,7 @@ function App() {
           className="basic-multi-select"
           classNamePrefix="select"
           options={minSalaryOptions}
-          onChange={(option)=> setSelectedMinBaseSalary(option)}
+          onChange={(option)=> setSelectedMinBaseSalary(option || null)}
         />
       </div>
 
@@ -212,8 +213,17 @@ function App() {
           justifyContent: "flex-start",
         }}
       >
-        {jobListAfterFilters.map((item, index) => (
-          <Card key={index} data={item} />
+        {jobListAfterFilters.map((item) => (
+          <Card 
+          key={item?.jdUid}
+          apiJobDetails={item?.jobDetailsFromCompany}
+          apijobRole={item?.jobRole}
+          apiLocation={item?.location}
+          apiMinExp={item?.minExp}
+          apiMinJdSalary={item?.minJdSalary}
+          apiMaxJdSalary={item?.maxJdSalary}
+          apisalaryCurrencyCode={item?.salaryCurrencyCode}
+          />
         ))}
       </div>
       {loading && <div>Loading more...</div>}
