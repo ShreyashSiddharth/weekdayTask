@@ -5,4 +5,9 @@
 
   font-family: "Lexend", sans-serif;
 }
-
+select{
+  -webkit-appearance: none;
+   -moz-appearance: none;
+   color: transparent;
+  text-shadow: 0 0 0 #000;
+}

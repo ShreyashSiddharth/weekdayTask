@@ -1,171 +1,222 @@
-
-import { useCallback, useEffect, useState } from 'react';
-import './App.css';
-import Card from './Components/Card/card';
-
+import { useCallback, useEffect, useState } from "react";
+import "./App.css";
+import Card from "./Components/Card/card";
+import Select from "react-select";
 
 function App() {
-  const [jobListFromApi , setJobListFromApi] = useState([]);
-  const [offset , setOffset] = useState(0);
-  const [loading , setLoading] = useState(false);
-  const [hasMore , setHasMore] = useState(true);
+  const [jobListAfterFilters, setJobListAfterFilters] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [selectedRoles, setSelectedRoles] = useState([]);
+  const [selectedLocations, setSelectedLocations] = useState([]);
+  const [selectedExperience , setSelectedExperience]  = useState(0);
+  const [selectedMinBaseSalary , setSelectedMinBaseSalary] = useState(0);
+  const [allJobs, setAllJobs] = useState([]);
+
   const fetchData = async () => {
     if (loading) return;
     setLoading(true);
 
     try {
-      const response = await fetch('https://api.weekday.technology/adhoc/getSampleJdJSON', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ limit: 9, offset: offset })
-      });
+      const response = await fetch(
+        "https://api.weekday.technology/adhoc/getSampleJdJSON",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ limit: 9, offset: offset }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      if ( !data || data?.jdList.length === 0) {
+      if (!data || data?.jdList.length === 0) {
         setHasMore(false);
       } else {
-        setJobListFromApi(prevItems => [...prevItems, ...data?.jdList]);
-        setOffset(prevOffset => prevOffset + 9);
+        setJobListAfterFilters((prevItems) => [...prevItems, ...data?.jdList]);
+        setAllJobs((prevItems) => [...prevItems, ...data?.jdList]);
+        setOffset((prevOffset) => prevOffset + 9);
       }
-
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
 
     setLoading(false);
   };
-  useEffect(()=>{
+
+  useEffect(() => {
     fetchData();
-  },[])
+  }, []);
   const handleScroll = useCallback(() => {
-   if (((window.innerHeight + window.scrollY) >= document.body.scrollHeight ) || loading || !hasMore) {
+    if (
+      window.innerHeight + window.scrollY >= document.body.scrollHeight ||
+      loading ||
+      !hasMore
+    ) {
       return;
     }
-    console.log("Scrolled to bottom ")
+    console.log("Scrolled to bottom ");
     fetchData();
   }, [loading, hasMore]);
 
   useEffect(() => {
-   
-    window.addEventListener('scroll', handleScroll);
-    
-    
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
-  useEffect(()=>{
-    console.log(jobListFromApi);
-  },[jobListFromApi])
+    window.addEventListener("scroll", handleScroll);
 
-  return (
-    <div style={{padding:"2rem"}} >
-    <div style={{display: 'flex' , justifyContent:"flex-start", flexFlow:"wrap"}}>
-    <select
-    style={{
-      padding : '0.56rem',
-      margin : '1rem'
-    }}
-    >
-      <option value="" disabled selected hidden>Roles</option>
-      <optgroup label="Engineering">
-      <option value="Backend" >Backend</option>
-      <option value="Frontend">Frontend</option>
-      <option value ="Tech Lead"> Tech Lead</option>
-      <option value ="React Native"> React Native</option>
-      </optgroup>
-    </select>
-    <select
-    style={{
-      padding : '0.56rem',
-      margin : '1rem'
-    }}
-    >
-      <option value="" disabled selected hidden> Location </option>
-      <optgroup label="Engineering">
-      <option value="Backend" >Backend</option>
-      <option value="Frontend">Frontend</option>
-      <option value ="Tech Lead"> Tech Lead</option>
-      <option value ="React Native"> React Native</option>
-      </optgroup>
-    </select>
-    <select
-    style={{
-      padding : '0.56rem',
-      margin : '1rem'
-    }}
-    >
-      <option value="" disabled selected hidden>Tech Stack</option>
-      <optgroup label="Engineering">
-      <option value="Backend" >Backend</option>
-      <option value="Frontend">Frontend</option>
-      <option value ="Tech Lead"> Tech Lead</option>
-      <option value ="React Native"> React Native</option>
-      </optgroup>
-    </select>
-    <select
-    style={{
-      padding : '0.56rem',
-      margin : '1rem'
-    }}
-    >
-      <option value="" disabled selected hidden>Experience</option>
-      <optgroup label="Engineering">
-      <option value="Backend" >Backend</option>
-      <option value="Frontend">Frontend</option>
-      <option value ="Tech Lead"> Tech Lead</option>
-      <option value ="React Native"> React Native</option>
-      </optgroup>
-    </select>
-    <select
-    style={{
-      padding : '0.56rem',
-      margin : '1rem'
-    }}
-    >
-      <option value="" disabled selected hidden>Remote</option>
-      <optgroup label="Engineering">
-      <option value="Backend" >Backend</option>
-      <option value="Frontend">Frontend</option>
-      <option value ="Tech Lead"> Tech Lead</option>
-      <option value ="React Native"> React Native</option>
-      </optgroup>
-    </select>
-    <select
-    style={{
-      padding : '0.56rem',
-      margin : '1rem'
-    }}
-    >
-      <option value="" disabled selected hidden>Minimum Base Pay Salary</option>
-      <optgroup label="Engineering">
-      <option value="Backend" >Backend</option>
-      <option value="Frontend">Frontend</option>
-      <option value ="Tech Lead"> Tech Lead</option>
-      <option value ="React Native"> React Native</option>
-      </optgroup>
-    </select>
-    <input
-    style={{
-      padding : '0.56rem',
-      margin : '1rem'
-    }}
-    placeholder  = "Select Company Name"
-    />
-      
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
+
+
+  const roleOptions = [
+    { value: "ios", label: "IOS" },
+    { value: "android", label: "Android" },
+    { value: "backend", label: "Backend" },
+    { value: "frontend", label: "Frontend" },
+    { value: "tech lead", label: "Tech Lead" },
+  ];
+  const locationOptions = [
+    { value: "remote", label: "Remote" },
+    { value: "delhi ncr", label: "Delhi NCR" },
+    { value: "mumbai", label: "Mumbai" },
+    { value: "chennai", label: "Chennai" },
+    { value: "bangalore", label: "Banglore" },
+  ];
+  const experienceOptions = [
+    { value: "1", label: "1" },
+    { value: "2", label: "2" },
+    { value: "3", label: "3" },
+    { value: "4", label: "4" },
+    { value: "5", label: "5" },
+    { value: "6", label: "6" },
+    { value: "7", label: "7" },
+    { value: "8", label: "8" },
+    { value: "9", label: "9" },
+    { value: "10", label: "10" },
+    { value: "11", label: "11" },
+  ];
+  const minSalaryOptions = [
+    { value: "0", label: "0K" },
+    { value: "10", label: "10K" },
+    { value: "20", label: "20K" },
+    { value: "30", label: "30K" },
+    { value: "40", label: "40K" },
+    { value: "40", label: "40K" },
+    { value: "50", label: "50K" },
+    { value: "60", label: "60K" },
+    { value: "70", label: "70K" },
+    { value: "80", label: "80K" },
+    { value: "90", label: "90K" },
+    { value: "100", label: "100K" },
+  ];
+  function applyFilters() {
+    let filteredJobs = allJobs;
   
-    </div>
     
-    <div style={{width : "100%" , display:"flex", flexFlow:"wrap",gap:"6rem" , justifyContent:"flex-start"}}>
-      {jobListFromApi.map((item , index) =>(
-        <Card key={index} data={item} />
-      ))}
-    </div>
-    {loading && <div>Loading more...</div>}
+    if (selectedRoles.length) {
+      filteredJobs = filteredJobs.filter(job =>
+        selectedRoles.some(role => job.jobRole.includes(role.value))
+      );
+    }
+  
+   
+    if (selectedLocations.length) {
+      filteredJobs = filteredJobs.filter(job =>
+        selectedLocations.some(location => job.location === location.value)
+      );
+    }
+  
+    
+    if (selectedExperience) {
+      filteredJobs = filteredJobs.filter(job =>
+        (job.minExp !== null ? job.minExp <= parseInt(selectedExperience.value) : true) &&
+        (job.maxExp !== null ? job.maxExp >= parseInt(selectedExperience.value) : true)
+      );
+    }
+  
+    
+    if (selectedMinBaseSalary) {
+      filteredJobs = filteredJobs.filter(job => 
+        job.minJdSalary !== null && job.minJdSalary >= parseInt(selectedMinBaseSalary.value)
+      );
+    }
+    setJobListAfterFilters(filteredJobs);
+    
+    
+  }
+  
+
+  useEffect(() => {
+    applyFilters();
+  }, [selectedRoles, selectedLocations, selectedExperience, selectedMinBaseSalary, allJobs]);
+  return (
+    <div style={{ padding: "2rem" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-start",
+          flexFlow: "wrap",
+          gap: "3rem",
+        }}
+      >
+        <Select
+          isMulti
+          isClearable
+          name="roles"
+          placeholder="Roles"
+          className="basic-multi-select"
+          classNamePrefix="select"
+          options={roleOptions}
+          onChange={(option)=> setSelectedRoles(option)}
+        />
+        <Select
+          isMulti
+          isClearable
+          name="location"
+          placeholder="Location"
+          className="basic-multi-select"
+          classNamePrefix="select"
+          options={locationOptions}
+          onChange={(option)=> setSelectedLocations(option)}
+        />
+
+        <Select
+          isClearable
+          name="Experience"
+          placeholder="Experience"
+          className="basic-multi-select"
+          classNamePrefix="select"
+          options={experienceOptions}
+          onChange={(option)=> setSelectedExperience(option)}
+        />
+        <Select
+          isClearable
+          name="Minimum Base Pay Salary"
+          placeholder="Minimum Base Pay Salary"
+          className="basic-multi-select"
+          classNamePrefix="select"
+          options={minSalaryOptions}
+          onChange={(option)=> setSelectedMinBaseSalary(option)}
+        />
+      </div>
+
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          flexFlow: "wrap",
+          gap: "6rem",
+          justifyContent: "flex-start",
+        }}
+      >
+        {jobListAfterFilters.map((item, index) => (
+          <Card key={index} data={item} />
+        ))}
+      </div>
+      {loading && <div>Loading more...</div>}
       {!hasMore && <div>No more data to load</div>}
     </div>
   );
