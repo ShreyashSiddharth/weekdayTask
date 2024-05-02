@@ -44,18 +44,18 @@ function App() {
     fetchData();
   },[])
   const handleScroll = useCallback(() => {
-   if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight  || loading || !hasMore) {
+   if (((window.innerHeight + window.scrollY) >= document.body.scrollHeight ) || loading || !hasMore) {
       return;
     }
-    console.log("Scrolled to bottom")
+    console.log("Scrolled to bottom ")
     fetchData();
   }, [loading, hasMore]);
 
   useEffect(() => {
-    // Attach scroll event listener
+   
     window.addEventListener('scroll', handleScroll);
     
-    // Clean up the event listener
+    
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll]);
   useEffect(()=>{
