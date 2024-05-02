@@ -4,14 +4,13 @@ import Card from "./Components/Card/card";
 import Select from "react-select";
 
 function App() {
- 
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [selectedRoles, setSelectedRoles] = useState([]);
   const [selectedLocations, setSelectedLocations] = useState([]);
-  const [selectedExperience , setSelectedExperience]  = useState(0);
-  const [selectedMinBaseSalary , setSelectedMinBaseSalary] = useState(0);
+  const [selectedExperience, setSelectedExperience] = useState(0);
+  const [selectedMinBaseSalary, setSelectedMinBaseSalary] = useState(0);
   const [allJobs, setAllJobs] = useState([]);
   const [jobListAfterFilters, setJobListAfterFilters] = useState(allJobs);
   const fetchData = async () => {
@@ -38,9 +37,8 @@ function App() {
       if (!data || data?.jdList.length === 0) {
         setHasMore(false);
       } else {
-       
         setAllJobs((prevItems) => [...prevItems, ...data?.jdList]);
-      
+
         setOffset((prevOffset) => prevOffset + 9);
       }
     } catch (error) {
@@ -70,7 +68,6 @@ function App() {
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
-
 
   const roleOptions = [
     { value: "ios", label: "IOS" },
@@ -115,54 +112,56 @@ function App() {
   ];
 
   useEffect(() => {
-    console.log(jobListAfterFilters); 
-}, [jobListAfterFilters]);
+    console.log(jobListAfterFilters);
+  }, [jobListAfterFilters]);
   function applyFilters() {
-    let filteredJobs = [...allJobs];  
+    let filteredJobs = [...allJobs];
 
     if (selectedRoles.length) {
-        filteredJobs = filteredJobs.filter(job =>
-            selectedRoles.some(role => role.value === job.jobRole)
-        );
+      filteredJobs = filteredJobs.filter((job) =>
+        selectedRoles.some((role) => role.value === job.jobRole)
+      );
     }
 
     if (selectedLocations.length) {
-        filteredJobs = filteredJobs.filter(job =>
-            selectedLocations.some(location => location.value === job.location)
-        );
+      filteredJobs = filteredJobs.filter((job) =>
+        selectedLocations.some((location) => location.value === job.location)
+      );
     }
 
     if (selectedExperience) {
-        filteredJobs = filteredJobs.filter(job => {
-            const expValue = parseInt(selectedExperience.value, 10);
-            return (job.minExp !== null ? job.minExp <= expValue : true) &&
-                (job.maxExp !== null ? job.maxExp >= expValue : true);
-        });
+      filteredJobs = filteredJobs.filter((job) => {
+        const expValue = parseInt(selectedExperience.value, 10);
+        return (
+          (job.minExp !== null ? job.minExp <= expValue : true) &&
+          (job.maxExp !== null ? job.maxExp >= expValue : true)
+        );
+      });
     }
 
     if (selectedMinBaseSalary) {
-        filteredJobs = filteredJobs.filter(job =>
-            job.minJdSalary !== null && job.minJdSalary >= parseInt(selectedMinBaseSalary.value, 10)
-        );
+      filteredJobs = filteredJobs.filter(
+        (job) =>
+          job.minJdSalary !== null &&
+          job.minJdSalary >= parseInt(selectedMinBaseSalary.value, 10)
+      );
     }
 
-    setJobListAfterFilters(filteredJobs);  
-}
-  
+    setJobListAfterFilters(filteredJobs);
+  }
 
   useEffect(() => {
     applyFilters();
-  }, [selectedRoles, selectedLocations, selectedExperience, selectedMinBaseSalary, allJobs]);
+  }, [
+    selectedRoles,
+    selectedLocations,
+    selectedExperience,
+    selectedMinBaseSalary,
+    allJobs,
+  ]);
   return (
     <div style={{ padding: "2rem" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-start",
-          flexFlow: "wrap",
-          gap: "3rem",
-        }}
-      >
+      <div className="filtersBoxDiv">
         <Select
           isMulti
           isClearable
@@ -171,7 +170,7 @@ function App() {
           className="basic-multi-select"
           classNamePrefix="select"
           options={roleOptions}
-          onChange={(option)=> setSelectedRoles(option || [])}
+          onChange={(option) => setSelectedRoles(option || [])}
         />
         <Select
           isMulti
@@ -181,7 +180,7 @@ function App() {
           className="basic-multi-select"
           classNamePrefix="select"
           options={locationOptions}
-          onChange={(option)=> setSelectedLocations(option || [])}
+          onChange={(option) => setSelectedLocations(option || [])}
         />
 
         <Select
@@ -191,7 +190,7 @@ function App() {
           className="basic-multi-select"
           classNamePrefix="select"
           options={experienceOptions}
-          onChange={(option)=> setSelectedExperience(option || null)}
+          onChange={(option) => setSelectedExperience(option || null)}
         />
         <Select
           isClearable
@@ -200,31 +199,27 @@ function App() {
           className="basic-multi-select"
           classNamePrefix="select"
           options={minSalaryOptions}
-          onChange={(option)=> setSelectedMinBaseSalary(option || null)}
+          onChange={(option) => setSelectedMinBaseSalary(option || null)}
         />
       </div>
 
-      <div
-        style={{
-          width: "100%",
-          display: "flex",
-          flexFlow: "wrap",
-          gap: "6rem",
-          justifyContent: "flex-start",
-        }}
-      >
-        {jobListAfterFilters.map((item) => (
-          <Card 
-          key={item?.jdUid}
-          apiJobDetails={item?.jobDetailsFromCompany}
-          apijobRole={item?.jobRole}
-          apiLocation={item?.location}
-          apiMinExp={item?.minExp}
-          apiMinJdSalary={item?.minJdSalary}
-          apiMaxJdSalary={item?.maxJdSalary}
-          apisalaryCurrencyCode={item?.salaryCurrencyCode}
-          />
-        ))}
+      <div className="jobCardsDiv">
+        {jobListAfterFilters.length > 0 ? (
+          jobListAfterFilters.map((item) => (
+            <Card
+              key={item?.jdUid}
+              apiJobDetails={item?.jobDetailsFromCompany}
+              apijobRole={item?.jobRole}
+              apiLocation={item?.location}
+              apiMinExp={item?.minExp}
+              apiMinJdSalary={item?.minJdSalary}
+              apiMaxJdSalary={item?.maxJdSalary}
+              apisalaryCurrencyCode={item?.salaryCurrencyCode}
+            />
+          ))
+        ) : (
+          <p>No Results To Show</p>
+        )}
       </div>
       {loading && <div>Loading more...</div>}
       {!hasMore && <div>No more data to load</div>}
