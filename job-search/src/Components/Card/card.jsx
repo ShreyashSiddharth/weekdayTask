@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import "../Card/card.css";
 
-function Card({data}) {
+function Card({ data }) {
+
+//  Company Name is Missing in the API so sample Company is Used
+
   const [aboutCompany, setAboutCompany] = useState("");
-  const [jobRole , setJobRole] = useState("");
-  const [jobLocation , setJobLocation] = useState("");
-  const [minExp , setMinExp] = useState("");
-  const [minJdSalary , setMinJdSalary] = useState("");
-  const [maxJdSalary , setMaxJdSalary] = useState("");
-  const [currencyCode , setCurrencyCode] = useState("")
+  const [jobRole, setJobRole] = useState("");
+  const [jobLocation, setJobLocation] = useState("");
+  const [minExp, setMinExp] = useState("");
+  const [minJdSalary, setMinJdSalary] = useState("");
+  const [maxJdSalary, setMaxJdSalary] = useState("");
+  const [currencyCode, setCurrencyCode] = useState("");
 
   const [isDescExpanded, setIsDescExpanded] = useState(false);
 
@@ -17,7 +20,7 @@ function Card({data}) {
     setJobLocation(data?.location);
     setMinExp(data?.minExp);
     setMinJdSalary(data?.minJdSalary);
-    setMaxJdSalary(data?.maxJdSalary)
+    setMaxJdSalary(data?.maxJdSalary);
     setAboutCompany(data?.jobDetailsFromCompany);
     setCurrencyCode(data?.salaryCurrencyCode);
   }, []);
@@ -25,21 +28,15 @@ function Card({data}) {
     const words = text.split(/\s+/);
     return words.slice(0, 35).join(" ") + "...";
   };
-  const salaryText = 
-    (currencyCode === "USD")?
-        (minJdSalary)?
-             `Estimated Salary: ${minJdSalary}K -  ${maxJdSalary}K USD ✅ `
-        :
-           `Estimated Salary: Upto ${maxJdSalary}K USD ✅ `
-        
-    :
-        (minJdSalary)?
-             `Estimated Salary: Rs${minJdSalary} -  ${maxJdSalary} Lakh ✅ `
-        :
-             `Estimated Salary: Upto Rs${maxJdSalary} Lakh ✅ `
-        
-    
-  
+  //Assumed That Salary is Either in USD or INR
+  const salaryText =
+    currencyCode === "USD"
+      ? minJdSalary
+        ? `Estimated Salary: ${minJdSalary}K -  ${maxJdSalary}K USD ✅ `
+        : `Estimated Salary: Upto ${maxJdSalary}K USD ✅ `
+      : minJdSalary
+      ? `Estimated Salary: Rs${minJdSalary} -  ${maxJdSalary} Lakh ✅ `
+      : `Estimated Salary: Upto Rs${maxJdSalary} Lakh ✅ `;
 
   return (
     <div
@@ -166,7 +163,9 @@ function Card({data}) {
         >
           Minimum Experience
         </h3>
-        <p style={{ margin: "0" }}>{minExp ? `${minExp} Years` : `Not Mentioned`}</p>
+        <p style={{ margin: "0" }}>
+          {minExp ? `${minExp} Years` : `Not Mentioned`}
+        </p>
         <div
           style={{
             margin: "0.5rem",

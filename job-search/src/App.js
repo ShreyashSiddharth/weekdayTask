@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import Card from './Components/Card/card';
 
@@ -43,6 +43,21 @@ function App() {
   useEffect(()=>{
     fetchData();
   },[])
+  const handleScroll = useCallback(() => {
+   if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight  || loading || !hasMore) {
+      return;
+    }
+    console.log("Scrolled to bottom")
+    fetchData();
+  }, [loading, hasMore]);
+
+  useEffect(() => {
+    // Attach scroll event listener
+    window.addEventListener('scroll', handleScroll);
+    
+    // Clean up the event listener
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
   useEffect(()=>{
     console.log(jobListFromApi);
   },[jobListFromApi])
@@ -150,7 +165,8 @@ function App() {
         <Card key={index} data={item} />
       ))}
     </div>
-    
+    {loading && <div>Loading more...</div>}
+      {!hasMore && <div>No more data to load</div>}
     </div>
   );
 }
